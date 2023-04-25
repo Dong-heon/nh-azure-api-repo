@@ -4,7 +4,7 @@ import openai
 app = Flask(__name__)
 
 # OpenAI API key
-openai.api_key = "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"
+openai.api_key = "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"
 
 # GPT-3 engine ID
 model_engine = "text-davinci-003"
