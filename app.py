@@ -1,46 +1,33 @@
-from flask import Flask, request, jsonify
-import openai
+import os
+
+from flask import (Flask, redirect, render_template, request,
+                   send_from_directory, url_for)
 
 app = Flask(__name__)
 
-# OpenAI API key
-openai.api_key = "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"
 
-# GPT-3 engine ID
-model_engine = "text-davinci-003"
-
-# ChatGPT function
-def chat(prompt):
-    response = openai.Completion.create(
-        engine=model_engine,
-        prompt=prompt,
-        max_tokens=2048,
-        n=1,
-        stop=None,
-        temperature=0.7
-    )
-    return response.choices[0].text.strip()
-
-#API test
 @app.route('/')
+def index():
+   print('Request for index page received')
+   return render_template('index.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@app.route('/hello', methods=['POST'])
 def hello():
-    return 'Hello, World!'
+   name = request.form.get('name')
 
-# API endpoint
-@app.route('/api/chat', methods=['POST'])
-def api_chat():
-    # Get JSON request data
-    request_data = request.get_json()
+   if name:
+       print('Request for hello page received with name=%s' % name)
+       return render_template('hello.html', name = name)
+   else:
+       print('Request for hello page received with no name or blank name -- redirecting')
+       return redirect(url_for('index'))
 
-    # Get prompt from request data
-    prompt = request_data['prompt']
 
-    # Generate chat response using ChatGPT function
-    response = chat(prompt)
-
-    # Return response in JSON format
-    return jsonify({'response': response})
-
-# Run app
 if __name__ == '__main__':
-    app.run()
+   app.run()
+
